@@ -1,6 +1,5 @@
 package com.bruce.security.filter;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bruce.security.config.JwtToken;
 import com.bruce.security.config.TokenAuthentication;
 import com.bruce.security.util.JwtUtil;
@@ -34,13 +33,12 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
-        String jwtToken = extractJwtToken(authorization);
-        if (jwtToken != null) {
-            String decode = JwtUtil.decode(jwtToken);
+        String token = extractJwtToken(authorization);
+        if (token != null) {
+            String decode = JwtUtil.decode(token);
             ObjectMapper mapper = new ObjectMapper();
-            JwtToken jwtToken1 = mapper.readValue(decode, JwtToken.class);
-            System.out.println(JSONObject.toJSONString(jwtToken1));
-            TokenAuthentication t = TokenAuthentication.of(jwtToken1);
+            JwtToken jwtToken = mapper.readValue(decode, JwtToken.class);
+            TokenAuthentication t = TokenAuthentication.of(jwtToken);
             SecurityContextHolder.getContext().setAuthentication(t);
         }
         chain.doFilter(request, response);
