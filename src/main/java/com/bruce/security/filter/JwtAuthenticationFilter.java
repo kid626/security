@@ -7,9 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,17 +20,44 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
+
+    private OrRequestMatcher orRequestMatcher;
+
+    private static final String[] AUTH_WHITELIST = {
+        "/",
+        "/login",
+        "/level2/**",
+        "/doc.html",
+        "/v2/api-docs",
+        "/swagger-resources",
+        "/swagger-resources/**",
+        "/configuration/ui",
+        "/configuration/security",
+        "/swagger-ui.html",
+        "/webjars/**"
+    };
+
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
+        // 初始化忽略的url不走过此滤器
+        List<RequestMatcher> matchers = Arrays.stream(AUTH_WHITELIST)
+            .map(AntPathRequestMatcher::new)
+            .collect(Collectors.toList());
+        orRequestMatcher = new OrRequestMatcher(matchers);
+
     }
 
     @Override
     protected void doFilterInternal(
         HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
+        System.out.println("JwtAuthenticationFilter:" + request.getServletPath());
         String authorization = request.getHeader("Authorization");
         if (authorization == null) {
             chain.doFilter(request, response);
@@ -84,4 +114,16 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         Date now = new Date();
         return (now.compareTo(max) <= 0 && now.compareTo(min) >= 0);
     }
+
+    /**
+     * 可以重写
+     * @param request
+     * @return 返回为true时，则不过滤即不会执行doFilterInternal
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return orRequestMatcher.matches(request);
+    }
+
+
 }
