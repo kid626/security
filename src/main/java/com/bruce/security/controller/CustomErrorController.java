@@ -39,9 +39,7 @@ public class CustomErrorController extends BasicErrorController {
     @Override
     @RequestMapping
     public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
-        ErrorAttributeOptions options = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE);
-        options = options.including(ErrorAttributeOptions.Include.EXCEPTION);
-        Map<String, Object> errorAttributes = getErrorAttributes(request, options);
+        Map<String, Object> errorAttributes = getErrorAttributes(request);
         HttpStatus status = getStatus(request);
         return new ResponseEntity<>(errorAttributes, status);
     }
@@ -50,13 +48,26 @@ public class CustomErrorController extends BasicErrorController {
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
         HttpStatus status = getStatus(request);
-        ErrorAttributeOptions options = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE);
-        options = options.including(ErrorAttributeOptions.Include.EXCEPTION);
         Map<String, Object> model = Collections
-                .unmodifiableMap(getErrorAttributes(request, options));
+                .unmodifiableMap(getErrorAttributes(request));
         response.setStatus(status.value());
         ModelAndView modelAndView = resolveErrorView(request, response, status, model);
         return (modelAndView != null) ? modelAndView : new ModelAndView("error", model);
+    }
+
+    private Map<String, Object> getErrorAttributes(HttpServletRequest request) {
+        // 获取异常参数
+        ErrorAttributeOptions options = ErrorAttributeOptions.of(
+                // 异常 message
+                ErrorAttributeOptions.Include.MESSAGE,
+                // 异常类型
+                ErrorAttributeOptions.Include.EXCEPTION,
+                // 异常堆栈，比较长
+                // ErrorAttributeOptions.Include.STACK_TRACE,
+                // 绑定的错误 error
+                ErrorAttributeOptions.Include.BINDING_ERRORS
+        );
+        return getErrorAttributes(request, options);
     }
 
     public static void runtimeExTest() throws CustomException {

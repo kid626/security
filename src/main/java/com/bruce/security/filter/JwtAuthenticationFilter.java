@@ -55,6 +55,8 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        // 手动抛出异常
+        // throw new CustomException("custom");
         System.out.println("JwtAuthenticationFilter:" + request.getServletPath());
         String authorization = request.getHeader("Authorization");
         if (authorization == null) {
