@@ -1,6 +1,6 @@
 package com.bruce.security.model.entity;
 
-import com.bruce.security.model.po.Role;
+import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +25,7 @@ public class UserModel extends User implements UserDetails {
         this.setEnable(true);
     }
 
-    private List<Role> authorities;
+    private List<Permission> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

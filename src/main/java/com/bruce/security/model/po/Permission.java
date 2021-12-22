@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 
@@ -23,7 +24,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @TableName("permission")
 @ApiModel(value = "Permission对象", description = "")
-public class Permission implements Serializable {
+public class Permission implements Serializable , GrantedAuthority {
 
     private static final long serialVersionUID = -1L;
 
@@ -46,5 +47,8 @@ public class Permission implements Serializable {
     @ApiModelProperty(value = "")
     private Long pid;
 
-
+    @Override
+    public String getAuthority() {
+        return code;
+    }
 }
