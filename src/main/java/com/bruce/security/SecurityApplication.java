@@ -1,6 +1,7 @@
 package com.bruce.security;
 
 import com.bruce.security.controller.CustomErrorController;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +9,7 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ import java.util.List;
  * @Author fzh
  */
 @SpringBootApplication
+@EnableWebSecurity
+@MapperScan("com.bruce.security.mapper")
 public class SecurityApplication {
 
     public static void main(String[] args) {

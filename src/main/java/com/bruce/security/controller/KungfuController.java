@@ -3,6 +3,7 @@ package com.bruce.security.controller;
 import com.bruce.security.model.LoginResp;
 import com.bruce.security.service.TokenIssueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +60,17 @@ public class KungfuController {
     @GetMapping("/level3/{path}")
     public String level3(@PathVariable("path") String path) {
         return PREFIX + "level3/" + path;
+    }
+
+    /**
+     * level4页面映射
+     * @param path
+     * @return
+     */
+    @GetMapping("/level4/{path}")
+    @Secured("ROLE_role1")
+    public String level4(@PathVariable("path") String path) {
+        return PREFIX + "level4/" + path;
     }
 
 
