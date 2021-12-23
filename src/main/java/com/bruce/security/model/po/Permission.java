@@ -24,7 +24,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @TableName("permission")
 @ApiModel(value = "Permission对象", description = "")
-public class Permission implements Serializable , GrantedAuthority {
+public class Permission implements Serializable, GrantedAuthority {
 
     private static final long serialVersionUID = -1L;
 

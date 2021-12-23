@@ -108,7 +108,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private boolean checkTimestamp(String timestamp) {
-        Date date = new Date(Long.valueOf(timestamp));
+        Date date = new Date(Long.parseLong(timestamp));
         Date max = new Date(date.getTime() + 300000L);
         Date min = new Date(date.getTime() - 300000L);
         Date now = new Date();

@@ -1,24 +1,24 @@
 package com.bruce.security.controller;
 
-import com.bruce.security.model.LoginResp;
-import com.bruce.security.service.TokenIssueService;
+import com.bruce.security.model.dto.LoginDTO;
+import com.bruce.security.model.security.UserAuthentication;
+import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class KungfuController {
 
     @Autowired
-    private TokenIssueService tokenIssueService;
+    private UserService userService;
 
     private final String PREFIX = "pages/";
 
     /**
      * 欢迎页
+     *
      * @return
      */
     @GetMapping("/")
@@ -27,13 +27,14 @@ public class KungfuController {
     }
 
     @PostMapping("/login")
-    public LoginResp login(String username) {
-        return tokenIssueService.issue(username);
+    public UserAuthentication login(@RequestBody @Validated LoginDTO dto) {
+        return userService.login(dto);
     }
 
 
     /**
      * level1页面映射
+     *
      * @param path
      * @return
      */
@@ -44,6 +45,7 @@ public class KungfuController {
 
     /**
      * level2页面映射
+     *
      * @param path
      * @return
      */
@@ -54,6 +56,7 @@ public class KungfuController {
 
     /**
      * level3页面映射
+     *
      * @param path
      * @return
      */
@@ -64,11 +67,12 @@ public class KungfuController {
 
     /**
      * level4页面映射
+     *
      * @param path
      * @return
      */
     @GetMapping("/level4/{path}")
-    @Secured("ROLE_role1")
+    @Secured("user")
     public String level4(@PathVariable("path") String path) {
         return PREFIX + "level4/" + path;
     }

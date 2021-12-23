@@ -1,4 +1,4 @@
-package com.bruce.security.model.entity;
+package com.bruce.security.model.security;
 
 import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.User;

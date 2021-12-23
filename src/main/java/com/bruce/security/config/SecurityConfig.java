@@ -1,6 +1,6 @@
 package com.bruce.security.config;
 
-import com.bruce.security.filter.JwtAuthenticationFilter;
+import com.bruce.security.filter.AuthenticationFilter;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @Copyright Copyright © 2020 fanzh . All rights reserved.
@@ -51,13 +52,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers("/level1/**").hasAuthority("admin")
-                .antMatchers("/level3/123").hasRole("role1")
-                .antMatchers("/level3/12").hasAnyRole("role1","role2")
                 .antMatchers("/level3/**").hasAnyAuthority("admin", "user")
                 .anyRequest().authenticated()
-                .and();
-                // .addFilter(createJWTAuthenticationFilter());
-
+                .and()
+                .addFilterBefore(createAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -66,8 +64,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtAuthenticationFilter createJWTAuthenticationFilter() throws Exception {
-        return new JwtAuthenticationFilter(authenticationManager());
+    public AuthenticationFilter createAuthenticationFilter() {
+        return new AuthenticationFilter();
     }
 
     @Bean
