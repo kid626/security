@@ -26,6 +26,14 @@ public interface UserService extends IService<User>, UserDetailsService {
      */
     UserAuthentication login(LoginDTO loginDTO);
 
+    /**
+     * token登录校验
+     *
+     * @param token token
+     * @return UserAuthentication
+     */
+    UserAuthentication login(String token);
+
 
     /**
      * 根据用户主键获取所有资源

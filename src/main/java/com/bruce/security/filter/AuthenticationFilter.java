@@ -1,15 +1,13 @@
 package com.bruce.security.filter;
 
-import com.alibaba.fastjson.JSONObject;
-import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.model.security.UserAuthentication;
+import com.bruce.security.service.UserService;
+import com.bruce.security.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private RedissonComponent redissonComponent;
+    private UserService userService;
 
     private static final String[] AUTH_WHITELIST = {
             "/",
@@ -43,31 +41,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        UserAuthentication user = (UserAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        if (user != null) {
-            SecurityContextHolder.getContext().setAuthentication(user);
-            chain.doFilter(request, response);
-            return;
-        }
         String token = request.getHeader("token");
-        if (StringUtils.isEmpty(token)) {
-            chain.doFilter(request, response);
-            return;
+        UserAuthentication authentication = userService.login(token);
+        if (authentication != null) {
+            UserUtil.setCurrentUser(authentication);
         }
-        String value = redissonComponent.getRBucket(token).get();
-        if (StringUtils.isEmpty(value)) {
-            chain.doFilter(request, response);
-            return;
-        }
-        UserAuthentication authentication = JSONObject.parseObject(value, UserAuthentication.class);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
 
     /**
      * 可以重写
      *
-     * @param request
+     * @param request HttpServletRequest
      * @return 返回为true时，则不过滤即不会执行doFilterInternal
      */
     @Override

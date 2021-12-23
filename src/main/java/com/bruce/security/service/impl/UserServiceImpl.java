@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +84,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<Permission> list = getByUserId(user.getId());
         userAuthentication.setAuthorities(list);
         redissonComponent.getRBucket(token).set(JSONObject.toJSONString(userAuthentication), 24, TimeUnit.HOURS);
+        return userAuthentication;
+    }
+
+    @Override
+    public UserAuthentication login(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return null;
+        }
+        String value = redissonComponent.getRBucket(token).get();
+        if (StringUtils.isEmpty(value)) {
+            return null;
+        }
+        UserAuthentication userAuthentication = JSONObject.parseObject(value, UserAuthentication.class);
+        // 刷新用户信息
+        User user = mapper.selectById(userAuthentication.getId());
+        BeanUtils.copyProperties(user, userAuthentication);
+        List<Permission> list = getByUserId(user.getId());
+        userAuthentication.setAuthorities(list);
         return userAuthentication;
     }
 
