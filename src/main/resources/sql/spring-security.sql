@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80025
 File Encoding         : 65001
 
-Date: 2021-12-22 20:12:31
+Date: 2021-12-23 18:49:45
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -32,6 +32,8 @@ CREATE TABLE `permission` (
 -- ----------------------------
 -- Records of permission
 -- ----------------------------
+INSERT INTO `permission` VALUES ('1', '/admin', 'admin', 'admin', 'admin', '0');
+INSERT INTO `permission` VALUES ('2', '/user', 'user', 'user', 'user', '0');
 
 -- ----------------------------
 -- Table structure for role
@@ -42,11 +44,13 @@ CREATE TABLE `role` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `code` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of role
 -- ----------------------------
+INSERT INTO `role` VALUES ('1', 'admin', 'admin');
+INSERT INTO `role` VALUES ('2', 'user', 'user');
 
 -- ----------------------------
 -- Table structure for role_permission
@@ -62,6 +66,9 @@ CREATE TABLE `role_permission` (
 -- ----------------------------
 -- Records of role_permission
 -- ----------------------------
+INSERT INTO `role_permission` VALUES ('1', '1', '1');
+INSERT INTO `role_permission` VALUES ('2', '1', '2');
+INSERT INTO `role_permission` VALUES ('3', '2', '2');
 
 -- ----------------------------
 -- Table structure for user
@@ -79,6 +86,7 @@ CREATE TABLE `user` (
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES ('1', 'admin', 'bruce', '1');
+INSERT INTO `user` VALUES ('2', 'user', 'bruce', '1');
 
 -- ----------------------------
 -- Table structure for user_role
@@ -94,3 +102,5 @@ CREATE TABLE `user_role` (
 -- ----------------------------
 -- Records of user_role
 -- ----------------------------
+INSERT INTO `user_role` VALUES ('1', '1', '1');
+INSERT INTO `user_role` VALUES ('2', '2', '2');
