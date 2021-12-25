@@ -1,6 +1,7 @@
 package com.bruce.security.component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bruce.security.config.SecurityProperty;
 import com.bruce.security.model.po.User;
 import com.bruce.security.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -19,30 +20,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisTokenComponent implements TokenComponent {
 
-    public RedisTokenComponent(UserService userService, RedissonComponent redissonComponent) {
-        this.userService = userService;
-        this.redissonComponent = redissonComponent;
-    }
-
     private final UserService userService;
 
     private final RedissonComponent redissonComponent;
 
-    /**
-     * 有效时间
-     */
-    private final long tokenExpire = 24 * 60 * 60 * 1000;
+    private final SecurityProperty.TokenManager tokenManager;
 
-    /**
-     * token 名称
-     */
-    private final String tokenName = "securitytoken";
+    public RedisTokenComponent(UserService userService, RedissonComponent redissonComponent, SecurityProperty.TokenManager tokenManager) {
+        this.userService = userService;
+        this.redissonComponent = redissonComponent;
+        this.tokenManager = tokenManager;
+    }
 
     @Override
     public String createToken(String username) {
         String token = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
         User user = userService.getByUsername(username);
-        redissonComponent.getRBucket(token).set(JSONObject.toJSONString(user), tokenExpire, TimeUnit.MILLISECONDS);
+        redissonComponent.getRBucket(token).set(JSONObject.toJSONString(user), tokenManager.getExpire(), TimeUnit.MILLISECONDS);
         return token;
     }
 
@@ -58,6 +52,7 @@ public class RedisTokenComponent implements TokenComponent {
 
     @Override
     public String getToken(HttpServletRequest request) {
+        String tokenName = tokenManager.getName();
         //step1:尝试从url参数获取
         String token = request.getParameter(tokenName);
         //step2:尝试从header获取

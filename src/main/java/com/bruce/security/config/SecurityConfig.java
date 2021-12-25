@@ -1,5 +1,6 @@
 package com.bruce.security.config;
 
+import com.bruce.security.component.JwtTokenComponent;
 import com.bruce.security.component.RedisTokenComponent;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.TokenComponent;
@@ -7,6 +8,7 @@ import com.bruce.security.filter.AuthenticationFilter;
 import com.bruce.security.filter.CustomSecurityMetadataSource;
 import com.bruce.security.handler.CustomAccessDeniedHandler;
 import com.bruce.security.handler.CustomAuthenticationEntryPoint;
+import com.bruce.security.model.enums.TokenType;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,20 +29,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String[] AUTH_WHITELIST = {
-            "/",
-            "/error",
-            "/login",
-            "/doc.html",
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**"
-    };
-
+    @Autowired
+    private SecurityProperty property;
     @Autowired
     private UserService userService;
     @Autowired
@@ -68,17 +58,42 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+        String[] defaultExcludeUrls = property.getDefaultExcludeUrls();
+        WebSecurity.IgnoredRequestConfigurer ignoredRequestConfigurer = web.ignoring().antMatchers(defaultExcludeUrls);
+        if (!isActiveProfile("prod")) {
+            ignoredRequestConfigurer.antMatchers(property.getSwaggerUrls());
+        }
+        if (property.getExcludeUrls() != null) {
+            ignoredRequestConfigurer.antMatchers(property.getExcludeUrls());
+        }
     }
 
     @Bean
     public TokenComponent tokenComponent(UserService userService, RedissonComponent redissonComponent) {
-        return new RedisTokenComponent(userService, redissonComponent);
-        // return new JwtTokenComponent(userService);
+        TokenType tokenType = property.getToken().getType();
+        if (tokenType == null) {
+            throw new IllegalArgumentException("tokenType 不能为空!");
+        }
+        if (tokenType == TokenType.JWT) {
+            return new JwtTokenComponent(userService, property.getToken());
+        }
+        if (tokenType == TokenType.REDIS) {
+            return new RedisTokenComponent(userService, redissonComponent, property.getToken());
+        }
+        throw new IllegalArgumentException("tokenType 不支持!");
     }
 
     @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
     public void refreshPermission() {
         customSecurityMetadataSource.refreshPermission();
+    }
+
+    private boolean isActiveProfile(String profile) {
+        for (String activeProfile : property.getActiveProfiles()) {
+            if (activeProfile.equals(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
