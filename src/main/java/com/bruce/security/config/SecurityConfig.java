@@ -45,6 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
     @Autowired
     private CustomSecurityMetadataSource customSecurityMetadataSource;
+    @Autowired
+    private RedissonComponent redissonComponent;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -60,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new AuthenticationFilter(authenticationManager(), userService))
+                .addFilter(new AuthenticationFilter(authenticationManager(), userService, tokenComponent(userService, redissonComponent)))
                 .httpBasic();
     }
 

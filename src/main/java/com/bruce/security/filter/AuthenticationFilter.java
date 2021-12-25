@@ -1,5 +1,6 @@
 package com.bruce.security.filter;
 
+import com.bruce.security.component.TokenComponent;
 import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.service.UserService;
 import com.bruce.security.util.UserUtil;
@@ -22,15 +23,17 @@ import java.io.IOException;
 public class AuthenticationFilter extends BasicAuthenticationFilter {
 
     private final UserService userService;
+    private final TokenComponent tokenComponent;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, UserService userService, TokenComponent tokenComponent) {
         super(authenticationManager);
         this.userService = userService;
+        this.tokenComponent = tokenComponent;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String token = request.getHeader("token");
+        String token = tokenComponent.getToken(request);
         UserAuthentication authentication = userService.login(token);
         if (authentication != null) {
             UserUtil.setCurrentUser(authentication);

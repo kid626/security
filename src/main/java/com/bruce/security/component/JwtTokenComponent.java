@@ -6,7 +6,10 @@ import com.bruce.security.service.UserService;
 import io.jsonwebtoken.CompressionCodecs;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -29,6 +32,10 @@ public class JwtTokenComponent implements TokenComponent {
      * 密钥
      */
     private final String tokenSecret = "123456";
+    /**
+     * 密钥
+     */
+    private final String tokenName = "Authorization";
 
     public JwtTokenComponent(UserService userService) {
         this.userService = userService;
@@ -51,5 +58,24 @@ public class JwtTokenComponent implements TokenComponent {
     @Override
     public void removeToken(String token) {
 
+    }
+
+    @Override
+    public String getToken(HttpServletRequest request) {
+        //step1:尝试从header获取
+        String token = request.getHeader(tokenName);
+        //step2:从cookie获取
+        if (StringUtils.isEmpty(token)) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals(tokenName)) {
+                        token = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+        }
+        return token;
     }
 }

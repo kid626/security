@@ -1,5 +1,7 @@
 package com.bruce.security.component;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @Copyright Copyright © 2021 fanzh . All rights reserved.
  * @Desc
@@ -30,5 +32,13 @@ public interface TokenComponent {
      * @param token token
      */
     void removeToken(String token);
+
+    /**
+     * 获取 token
+     *
+     * @param request http 请求
+     * @return  token
+     */
+    String getToken(HttpServletRequest request);
 
 }

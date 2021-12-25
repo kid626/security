@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolve
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.List;
 @SpringBootApplication
 @EnableWebSecurity
 @MapperScan("com.bruce.security.mapper")
-@EnableGlobalMethodSecurity(securedEnabled = true)
 @EnableScheduling
 public class SecurityApplication {
 

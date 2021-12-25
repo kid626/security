@@ -3,7 +3,10 @@ package com.bruce.security.component;
 import com.alibaba.fastjson.JSONObject;
 import com.bruce.security.model.po.User;
 import com.bruce.security.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +33,11 @@ public class RedisTokenComponent implements TokenComponent {
      */
     private final long tokenExpire = 24 * 60 * 60 * 1000;
 
+    /**
+     * token 名称
+     */
+    private final String tokenName = "securitytoken";
+
     @Override
     public String createToken(String username) {
         String token = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
@@ -46,6 +54,29 @@ public class RedisTokenComponent implements TokenComponent {
     @Override
     public void removeToken(String token) {
         redissonComponent.getRBucket(token).delete();
+    }
+
+    @Override
+    public String getToken(HttpServletRequest request) {
+        //step1:尝试从url参数获取
+        String token = request.getParameter(tokenName);
+        //step2:尝试从header获取
+        if (StringUtils.isEmpty(token)) {
+            token = request.getHeader(tokenName);
+        }
+        //step3:从cookie获取
+        if (StringUtils.isEmpty(token)) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals(tokenName)) {
+                        token = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+        }
+        return token;
     }
 
 }

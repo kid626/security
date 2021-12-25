@@ -4,7 +4,6 @@ import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,9 +71,19 @@ public class KungfuController {
      * @return
      */
     @GetMapping("/level4/{path}")
-    @Secured("user")
     public String level4(@PathVariable("path") String path) {
         return PREFIX + "level4/" + path;
+    }
+
+    /**
+     * level5页面映射
+     *
+     * @param path
+     * @return
+     */
+    @GetMapping("/level5/{path}")
+    public String level5(@PathVariable("path") String path) {
+        return PREFIX + "level5/" + path;
     }
 
 
