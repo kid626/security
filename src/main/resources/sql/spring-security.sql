@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80025
 File Encoding         : 65001
 
-Date: 2021-12-23 18:49:45
+Date: 2021-12-25 16:26:48
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -32,8 +32,10 @@ CREATE TABLE `permission` (
 -- ----------------------------
 -- Records of permission
 -- ----------------------------
-INSERT INTO `permission` VALUES ('1', '/admin', 'admin', 'admin', 'admin', '0');
-INSERT INTO `permission` VALUES ('2', '/user', 'user', 'user', 'user', '0');
+INSERT INTO `permission` VALUES ('1', '/level1/*', 'level1', 'level1', 'level1', '0');
+INSERT INTO `permission` VALUES ('2', '/level2/*', 'level2', 'level2', 'level2', '0');
+INSERT INTO `permission` VALUES ('3', '/level3/*', 'level3', 'level3', 'level3', '0');
+INSERT INTO `permission` VALUES ('4', '/level4/*', 'level4', 'level4', 'level4', '0');
 
 -- ----------------------------
 -- Table structure for role
@@ -68,7 +70,10 @@ CREATE TABLE `role_permission` (
 -- ----------------------------
 INSERT INTO `role_permission` VALUES ('1', '1', '1');
 INSERT INTO `role_permission` VALUES ('2', '1', '2');
-INSERT INTO `role_permission` VALUES ('3', '2', '2');
+INSERT INTO `role_permission` VALUES ('3', '1', '3');
+INSERT INTO `role_permission` VALUES ('4', '1', '4');
+INSERT INTO `role_permission` VALUES ('5', '2', '2');
+INSERT INTO `role_permission` VALUES ('6', '2', '4');
 
 -- ----------------------------
 -- Table structure for user
@@ -80,13 +85,14 @@ CREATE TABLE `user` (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `enable` tinyint(1) DEFAULT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES ('1', 'admin', 'bruce', '1');
 INSERT INTO `user` VALUES ('2', 'user', 'bruce', '1');
+INSERT INTO `user` VALUES ('3', 'anon', 'bruce', '1');
 
 -- ----------------------------
 -- Table structure for user_role

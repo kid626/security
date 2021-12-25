@@ -16,10 +16,10 @@ import java.io.IOException;
  * @Date 2021/12/23 20:59
  * @Author fzh
  */
-public class UnAuthorizedEntryPoint implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.getWriter().write(JSONObject.toJSONString(new JSONObject().fluentPut("code", "401").fluentPut("msg", "UnAuthorized")));
+        response.getWriter().write(JSONObject.toJSONString(new JSONObject().fluentPut("code", "401").fluentPut("msg", authException.getMessage())));
     }
 }

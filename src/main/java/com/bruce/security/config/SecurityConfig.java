@@ -4,11 +4,14 @@ import com.bruce.security.component.RedisTokenComponent;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.filter.AuthenticationFilter;
-import com.bruce.security.handler.UnAuthorizedEntryPoint;
+import com.bruce.security.filter.CustomSecurityMetadataSource;
+import com.bruce.security.handler.CustomAccessDeniedHandler;
+import com.bruce.security.handler.CustomAuthenticationEntryPoint;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -28,7 +31,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/",
             "/error",
             "/login",
-            "/level2/**",
             "/doc.html",
             "/v2/api-docs",
             "/swagger-resources",
@@ -41,20 +43,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CustomSecurityMetadataSource customSecurityMetadataSource;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .exceptionHandling().authenticationEntryPoint(new UnAuthorizedEntryPoint())
+                .exceptionHandling()
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and()
                 .cors().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                // TODO 改成动态配置的形式
-                .antMatchers("/level1/**").hasAuthority("admin")
-                .antMatchers("/level3/**").hasAnyAuthority("admin", "user")
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager(), userService))
@@ -72,4 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // return new JwtTokenComponent(userService);
     }
 
+    @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
+    public void refreshPermission() {
+        customSecurityMetadataSource.refreshPermission();
+    }
 }
