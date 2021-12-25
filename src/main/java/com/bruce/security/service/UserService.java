@@ -5,7 +5,6 @@ import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.User;
 import com.bruce.security.model.security.UserAuthentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @Date 2021-12-22 19:33:26
  * @Author Bruce
  */
-public interface UserService extends IService<User>, UserDetailsService {
+public interface UserService extends IService<User> {
 
     /**
      * 登录校验
@@ -33,6 +32,14 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @return UserAuthentication
      */
     UserAuthentication login(String token);
+
+    /**
+     * 根据用户名查询
+     *
+     * @param username 用户名
+     * @return 用户
+     */
+    User getByUsername(String username);
 
 
     /**

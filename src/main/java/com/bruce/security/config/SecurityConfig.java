@@ -1,17 +1,18 @@
 package com.bruce.security.config;
 
+import com.bruce.security.component.RedisTokenComponent;
+import com.bruce.security.component.RedissonComponent;
+import com.bruce.security.component.TokenComponent;
 import com.bruce.security.filter.AuthenticationFilter;
+import com.bruce.security.handler.UnAuthorizedEntryPoint;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @Copyright Copyright © 2020 fanzh . All rights reserved.
@@ -41,37 +42,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .exceptionHandling().authenticationEntryPoint(new UnAuthorizedEntryPoint())
+                .and()
                 .cors().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
+                // TODO 改成动态配置的形式
                 .antMatchers("/level1/**").hasAuthority("admin")
                 .antMatchers("/level3/**").hasAnyAuthority("admin", "user")
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(createAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilter(new AuthenticationFilter(authenticationManager(), userService))
+                .httpBasic();
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Bean
-    public AuthenticationFilter createAuthenticationFilter() {
-        return new AuthenticationFilter();
+    public TokenComponent tokenComponent(UserService userService, RedissonComponent redissonComponent) {
+        return new RedisTokenComponent(userService, redissonComponent);
+        // return new JwtTokenComponent(userService);
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
 }
