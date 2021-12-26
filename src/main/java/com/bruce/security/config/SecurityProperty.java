@@ -33,7 +33,7 @@ public class SecurityProperty implements EnvironmentAware {
 
     private Environment env;
 
-    private TokenManager token;
+    private TokenManager token = new TokenManager();
 
 
     @Override

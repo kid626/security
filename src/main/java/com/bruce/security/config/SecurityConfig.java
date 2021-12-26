@@ -70,17 +70,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public TokenComponent tokenComponent(UserService userService, RedissonComponent redissonComponent) {
-        TokenType tokenType = property.getToken().getType();
+        SecurityProperty.TokenManager tokenManager = property.getToken();
+        if (tokenManager == null) {
+            throw new IllegalArgumentException("token 不能为空!");
+        }
+        TokenType tokenType = tokenManager.getType();
         if (tokenType == null) {
-            throw new IllegalArgumentException("tokenType 不能为空!");
+            throw new IllegalArgumentException("token.type 不能为空!");
         }
         if (tokenType == TokenType.JWT) {
-            return new JwtTokenComponent(userService, property.getToken());
+            return new JwtTokenComponent(userService, tokenManager);
         }
         if (tokenType == TokenType.REDIS) {
-            return new RedisTokenComponent(userService, redissonComponent, property.getToken());
+            return new RedisTokenComponent(userService, redissonComponent, tokenManager);
         }
-        throw new IllegalArgumentException("tokenType 不支持!");
+        throw new IllegalArgumentException("token.type 不支持!");
     }
 
     @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
