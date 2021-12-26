@@ -34,6 +34,11 @@ public interface UserService extends IService<User> {
     UserAuthentication login(String token);
 
     /**
+     * 登出
+     */
+    void logout();
+
+    /**
      * 根据用户名查询
      *
      * @param username 用户名
@@ -50,5 +55,18 @@ public interface UserService extends IService<User> {
      */
     List<Permission> getByUserId(Long userId);
 
+    /**
+     * 获取密钥
+     *
+     * @param username 用户名
+     * @return 密钥
+     */
+    String getLoginSecretKey(String username);
 
+    /**
+     * 获取资源列表
+     *
+     * @return 当前用户资源列表
+     */
+    List<String> permList();
 }

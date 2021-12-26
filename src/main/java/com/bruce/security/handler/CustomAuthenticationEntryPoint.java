@@ -1,6 +1,7 @@
 package com.bruce.security.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bruce.security.model.common.Result;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -20,6 +21,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.getWriter().write(JSONObject.toJSONString(new JSONObject().fluentPut("code", "401").fluentPut("msg", authException.getMessage())));
+        response.getWriter().write(JSONObject.toJSONString(Result.fail(401, authException.getMessage())));
     }
 }
