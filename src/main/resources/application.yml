@@ -53,4 +53,5 @@ security:
     name: rid
   retry:
     expire: 7200
+    nums: 5
 
