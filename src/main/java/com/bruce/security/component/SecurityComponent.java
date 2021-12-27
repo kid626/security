@@ -42,11 +42,10 @@ public class SecurityComponent {
     public void checkCaptchaAndDelete(String rid, String code) {
         String key = MessageFormat.format(RedisConstant.IMAGE_CAPTCHA_RID, rid);
         RBucket<String> captchaBucket = redissonComponent.getRBucket(key);
-        String captcha = captchaBucket.get();
+        String captcha = captchaBucket.getAndDelete();
         if (StringUtils.isBlank(captcha)) {
             throw new SecurityException("验证码错误!");
         }
-        captchaBucket.delete();
         if (!StringUtils.equalsIgnoreCase(captcha, code)) {
             throw new SecurityException("验证码错误!");
         }

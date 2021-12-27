@@ -38,3 +38,19 @@ mybatis-plus:
   mapper-locations: classpath:com/bruce/security/sqlmap/auto/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+security:
+  defaultExcludeUrls: [ "/security/login", "/security/secretKey", "/security/showResScript","/security/showResTree", "/security/images/captcha", "/security/redirect", "/error" ]
+  swaggerUrls: [ "/doc.html", "/v2/api-docs", "/v2/api-docs-ext","/swagger-resources", "/webjars/**" ]
+  token:
+    type: REDIS
+    expire: 172800000
+    name: securitytoken
+  captcha:
+    enable: Y
+    expire: 120
+    length: 16
+    name: rid
+  retry:
+    expire: 7200
+
