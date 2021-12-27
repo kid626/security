@@ -3,10 +3,11 @@ package com.bruce.security.controller;
 import com.bruce.security.component.CaptchaComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.config.SecurityProperty;
-import com.bruce.security.exceptions.ServiceException;
+import com.bruce.security.exceptions.SecurityException;
 import com.bruce.security.model.common.ImageCaptcha;
 import com.bruce.security.model.common.Result;
 import com.bruce.security.model.dto.LoginDTO;
+import com.bruce.security.model.enums.YesOrNoEnum;
 import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.model.vo.PermissionVO;
 import com.bruce.security.service.PermissionService;
@@ -134,11 +135,15 @@ public class SecurityController {
             @RequestParam(value = "height", defaultValue = "40", required = false) Integer height,
             HttpServletResponse response) {
         try {
-            if (rid.length() != 16) {
-                throw new ServiceException("invalid rid");
+            SecurityProperty.CaptchaManager captcha = property.getCaptcha();
+            if (captcha == null || YesOrNoEnum.NO.getCode().equals(captcha.getEnable())) {
+                return;
+            }
+            if (rid.length() != captcha.getLength()) {
+                throw new SecurityException("invalid rid");
             }
             ImageCaptcha imageCaptcha = captchaComponent.createCaptcha(width, height, rid);
-            response.setHeader("X-Rid", imageCaptcha.getRid());
+            response.setHeader(captcha.getName(), imageCaptcha.getRid());
             response.setContentType(MediaType.IMAGE_PNG_VALUE);
             ImageCaptchaUtil.toByteArray(imageCaptcha.getBufferedImage(), response);
         } catch (Exception e) {

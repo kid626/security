@@ -7,21 +7,21 @@ package com.bruce.security.exceptions;
  * @Date 2021/12/23 9:42
  * @Author fzh
  */
-public class ServiceException extends RuntimeException {
+public class SecurityException extends RuntimeException {
 
-    public ServiceException() {
+    public SecurityException() {
         super();
     }
 
-    public ServiceException(String message) {
+    public SecurityException(String message) {
         super(message);
     }
 
-    public ServiceException(String message, Throwable cause) {
+    public SecurityException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ServiceException(Throwable cause) {
+    public SecurityException(Throwable cause) {
         super(cause);
     }
 }

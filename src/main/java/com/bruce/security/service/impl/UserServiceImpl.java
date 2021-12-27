@@ -3,12 +3,15 @@ package com.bruce.security.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bruce.security.component.CaptchaComponent;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.TokenComponent;
-import com.bruce.security.exceptions.ServiceException;
+import com.bruce.security.config.SecurityProperty;
+import com.bruce.security.exceptions.SecurityException;
 import com.bruce.security.mapper.UserMapper;
 import com.bruce.security.model.constant.RedisConstant;
 import com.bruce.security.model.dto.LoginDTO;
+import com.bruce.security.model.enums.YesOrNoEnum;
 import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.Role;
 import com.bruce.security.model.po.User;
@@ -54,14 +57,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RedissonComponent redissonComponent;
 
+    @Autowired
+    private CaptchaComponent captchaComponent;
+
+    @Autowired
+    private SecurityProperty property;
+
     @Override
     public UserAuthentication login(LoginDTO loginDTO) {
+        SecurityProperty.CaptchaManager captcha = property.getCaptcha();
+        if (captcha != null && !YesOrNoEnum.NO.getCode().equals(captcha.getEnable())) {
+            captchaComponent.checkCaptchaAndDelete(loginDTO.getVerifyKey(), loginDTO.getVerifyCode());
+        }
         User user = getByUsername(loginDTO.getUsername());
         if (user == null) {
-            throw new ServiceException("用户名或密码错误!");
+            throw new SecurityException("用户名或密码错误!");
         }
         if (!loginDTO.getPassword().equals(user.getPassword())) {
-            throw new ServiceException("用户名或密码错误!");
+            throw new SecurityException("用户名或密码错误!");
         }
         UserAuthentication userAuthentication = new UserAuthentication();
         BeanUtils.copyProperties(user, userAuthentication);

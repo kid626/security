@@ -18,7 +18,6 @@ public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = 1221975422896108465L;
     private static int SUCCESS_CODE = 200;
-    private static int ERROR_CODE = 500;
     private String requestId;
     private String msg;
     private long time;
@@ -33,12 +32,12 @@ public class Result<T> implements Serializable {
         this.data = data;
     }
 
-    public static Result<String> fail(int code, String msg) {
-        return new Result<>(code, msg, "");
+    public static Result<String> fail(Error error) {
+        return new Result<>(error.getCode(), error.getMessage(), "");
     }
 
-    public static Result<String> fail(String msg) {
-        return new Result<>(ERROR_CODE, msg, "");
+    public static Result<String> fail(int code, String msg) {
+        return new Result<>(code, msg, "");
     }
 
     public static <T> Result<T> success(T data) {

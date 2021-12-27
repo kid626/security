@@ -35,6 +35,8 @@ public class SecurityProperty implements EnvironmentAware {
 
     private TokenManager token = new TokenManager();
 
+    private CaptchaManager captcha = new CaptchaManager();
+
 
     @Override
     public void setEnvironment(Environment environment) {
@@ -44,7 +46,7 @@ public class SecurityProperty implements EnvironmentAware {
 
 
     @Data
-    public class TokenManager {
+    public static class TokenManager {
 
         private TokenType type = TokenType.REDIS;
 
@@ -53,6 +55,19 @@ public class SecurityProperty implements EnvironmentAware {
         private String name = "token";
 
         private String secret;
+
+    }
+
+    @Data
+    public static class CaptchaManager {
+
+        private String enable = "Y";
+
+        private long expire = 2 * 60;
+
+        private int length = 16;
+
+        private String name = "X-Rid";
 
     }
 }
