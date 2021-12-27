@@ -53,7 +53,6 @@ public class TokenUtil {
         for (int i = 0; i < 5; i++) {
             originString.append(alpha[random.nextInt(61)]);
         }
-
         String token;
         token = Sha2Crypt.sha512Crypt(originString.toString().getBytes(StandardCharsets.UTF_8));
         token = Base64.encodeBase64URLSafeString(token.getBytes(StandardCharsets.UTF_8));

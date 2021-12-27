@@ -3,11 +3,10 @@ package com.bruce.security.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bruce.security.component.CaptchaComponent;
 import com.bruce.security.component.RedissonComponent;
+import com.bruce.security.component.SecurityComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.config.SecurityProperty;
-import com.bruce.security.exceptions.SecurityException;
 import com.bruce.security.mapper.UserMapper;
 import com.bruce.security.model.constant.RedisConstant;
 import com.bruce.security.model.dto.LoginDTO;
@@ -19,8 +18,8 @@ import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.service.RolePermissionService;
 import com.bruce.security.service.UserRoleService;
 import com.bruce.security.service.UserService;
-import com.bruce.security.util.TokenUtil;
 import com.bruce.security.util.UserUtil;
+import org.redisson.api.RAtomicLong;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ import org.springframework.util.StringUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RedissonComponent redissonComponent;
 
     @Autowired
-    private CaptchaComponent captchaComponent;
+    private SecurityComponent securityComponent;
 
     @Autowired
     private SecurityProperty property;
@@ -66,15 +64,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public UserAuthentication login(LoginDTO loginDTO) {
         SecurityProperty.CaptchaManager captcha = property.getCaptcha();
+        SecurityProperty.RetryManager retryManager = property.getRetry();
         if (captcha != null && !YesOrNoEnum.NO.getCode().equals(captcha.getEnable())) {
-            captchaComponent.checkCaptchaAndDelete(loginDTO.getVerifyKey(), loginDTO.getVerifyCode());
+            securityComponent.checkCaptchaAndDelete(loginDTO.getRid(), loginDTO.getCode());
         }
+        RAtomicLong retryNumAtomicLong = redissonComponent.getRAtomicLong(MessageFormat.format(RedisConstant.LOGIN_RETRY_NUM, loginDTO.getUsername()));
         User user = getByUsername(loginDTO.getUsername());
-        if (user == null) {
-            throw new SecurityException("用户名或密码错误!");
-        }
-        if (!loginDTO.getPassword().equals(user.getPassword())) {
-            throw new SecurityException("用户名或密码错误!");
+        if (user == null || !loginDTO.getPassword().equals(user.getPassword())) {
+            securityComponent.incrExpireAndThrow(retryNumAtomicLong, retryManager);
         }
         UserAuthentication userAuthentication = new UserAuthentication();
         BeanUtils.copyProperties(user, userAuthentication);
@@ -130,15 +127,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             result.addAll(permissionList);
         }
         return result;
-    }
-
-    @Override
-    public String getLoginSecretKey(String username) {
-        String token = TokenUtil.getToken(username, 16);
-        //设置1分钟有效期
-        String key = MessageFormat.format(RedisConstant.SECRET_KEY, username);
-        redissonComponent.getRBucket(key).set(token, 1L, TimeUnit.MINUTES);
-        return token;
     }
 
     @Override

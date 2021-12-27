@@ -16,4 +16,6 @@ public class RedisConstant {
 
     public static final String IMAGE_CAPTCHA_RID = "security:image:captcha:rid:{0}";
 
+    public static final String LOGIN_RETRY_NUM = "security:login:retry:{0}";
+
 }

@@ -1,11 +1,10 @@
 package com.bruce.security.controller;
 
-import com.bruce.security.model.dto.LoginDTO;
-import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class KungfuController {
@@ -24,12 +23,6 @@ public class KungfuController {
     public String index() {
         return "welcome";
     }
-
-    @PostMapping("/login")
-    public UserAuthentication login(@RequestBody @Validated LoginDTO dto) {
-        return userService.login(dto);
-    }
-
 
     /**
      * level1页面映射

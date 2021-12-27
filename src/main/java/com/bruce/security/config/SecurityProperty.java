@@ -1,6 +1,7 @@
 package com.bruce.security.config;
 
 import com.bruce.security.model.enums.TokenType;
+import com.bruce.security.model.enums.YesOrNoEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
@@ -37,6 +38,8 @@ public class SecurityProperty implements EnvironmentAware {
 
     private CaptchaManager captcha = new CaptchaManager();
 
+    private RetryManager retry = new RetryManager();
+
 
     @Override
     public void setEnvironment(Environment environment) {
@@ -61,13 +64,22 @@ public class SecurityProperty implements EnvironmentAware {
     @Data
     public static class CaptchaManager {
 
-        private String enable = "Y";
+        private String enable = YesOrNoEnum.NO.getCode();
 
         private long expire = 2 * 60;
 
         private int length = 16;
 
         private String name = "X-Rid";
+
+    }
+
+    @Data
+    public static class RetryManager {
+
+        private long expire = 24 * 60 * 60;
+
+        private int nums = 5;
 
     }
 }

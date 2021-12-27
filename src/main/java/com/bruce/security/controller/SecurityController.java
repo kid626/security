@@ -1,6 +1,6 @@
 package com.bruce.security.controller;
 
-import com.bruce.security.component.CaptchaComponent;
+import com.bruce.security.component.SecurityComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.config.SecurityProperty;
 import com.bruce.security.exceptions.SecurityException;
@@ -48,12 +48,15 @@ public class SecurityController {
     @Autowired
     private TokenComponent tokenComponent;
     @Autowired
-    private CaptchaComponent captchaComponent;
+    private SecurityComponent securityComponent;
 
 
     @ApiOperation("登录")
     @PostMapping(value = "/login")
     public Result<UserAuthentication> login(@RequestBody LoginDTO dto, HttpServletRequest request, HttpServletResponse response) {
+        String username = dto.getUsername();
+        String password = securityComponent.getRealPassword(username, dto.getPassword());
+        dto.setPassword(password);
         UserAuthentication user = userService.login(dto);
         //cookie
         response.addCookie(CookieUtil.createCookie(property.getToken().getName(), user.getToken()));
@@ -96,7 +99,7 @@ public class SecurityController {
     @ApiOperation("获取登录密钥")
     @GetMapping(value = "/secretKey")
     public Result<String> loginSecretKey(String username) {
-        String secretKey = userService.getLoginSecretKey(username);
+        String secretKey = securityComponent.getLoginSecretKey(username);
         return Result.success(secretKey);
     }
 
@@ -142,7 +145,7 @@ public class SecurityController {
             if (rid.length() != captcha.getLength()) {
                 throw new SecurityException("invalid rid");
             }
-            ImageCaptcha imageCaptcha = captchaComponent.createCaptcha(width, height, rid);
+            ImageCaptcha imageCaptcha = securityComponent.createCaptcha(width, height, rid);
             response.setHeader(captcha.getName(), imageCaptcha.getRid());
             response.setContentType(MediaType.IMAGE_PNG_VALUE);
             ImageCaptchaUtil.toByteArray(imageCaptcha.getBufferedImage(), response);

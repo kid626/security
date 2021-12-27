@@ -17,9 +17,9 @@ public class LoginDTO {
     private String username;
     @ApiModelProperty("密码")
     private String password;
-    @ApiModelProperty("验证码key")
-    private String verifyKey;
+    @ApiModelProperty("rid")
+    private String rid;
     @ApiModelProperty("验证码code")
-    private String verifyCode;
+    private String code;
 
 }
