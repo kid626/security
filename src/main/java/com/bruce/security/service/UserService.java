@@ -1,6 +1,5 @@
 package com.bruce.security.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.User;
@@ -15,7 +14,7 @@ import java.util.List;
  * @Date 2021-12-22 19:33:26
  * @Author Bruce
  */
-public interface UserService extends IService<User> {
+public interface UserService {
 
     /**
      * 登录校验
@@ -61,4 +60,13 @@ public interface UserService extends IService<User> {
      * @return 当前用户资源列表
      */
     List<String> permList();
+
+    /**
+     * 新增
+     *
+     * @param user User
+     * @return 主键
+     */
+    long save(User user);
+
 }

@@ -1,5 +1,6 @@
 package com.bruce.security.model.security;
 
+import com.bruce.security.model.enums.YesOrNoEnum;
 import com.bruce.security.model.po.Permission;
 import com.bruce.security.model.po.User;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class UserModel extends User implements UserDetails {
     public UserModel(String username, String password) {
         this.setUsername(username);
         this.setPassword(password);
-        this.setEnable(true);
+        this.setEnable(YesOrNoEnum.YES.getCode());
     }
 
     private List<Permission> authorities;
@@ -49,6 +50,6 @@ public class UserModel extends User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.getEnable();
+        return YesOrNoEnum.YES.getCode().equals(this.getEnable());
     }
 }

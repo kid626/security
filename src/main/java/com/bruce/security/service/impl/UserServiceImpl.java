@@ -2,7 +2,6 @@ package com.bruce.security.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.SecurityComponent;
 import com.bruce.security.component.TokenComponent;
@@ -18,6 +17,8 @@ import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.service.RolePermissionService;
 import com.bruce.security.service.UserRoleService;
 import com.bruce.security.service.UserService;
+import com.bruce.security.util.EncryptUtil;
+import com.bruce.security.util.RandomUtil;
 import com.bruce.security.util.UserUtil;
 import org.redisson.api.RAtomicLong;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +40,7 @@ import java.util.stream.Collectors;
  * @Author Bruce
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper mapper;
@@ -70,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         RAtomicLong retryNumAtomicLong = redissonComponent.getRAtomicLong(MessageFormat.format(RedisConstant.LOGIN_RETRY_NUM, loginDTO.getUsername()));
         User user = getByUsername(loginDTO.getUsername());
-        if (user == null || !loginDTO.getPassword().equals(user.getPassword())) {
+        if (user == null || !user.getPassword().equals(EncryptUtil.md5(loginDTO.getPassword(), user.getSalt()))) {
             securityComponent.incrExpireAndThrow(retryNumAtomicLong, retryManager);
         }
         UserAuthentication userAuthentication = new UserAuthentication();
@@ -114,7 +116,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.lambda()
                 .eq(User::getUsername, username)
-                .eq(User::getEnable, 1);
+                .eq(User::getEnable, YesOrNoEnum.YES.getCode());
         return mapper.selectOne(wrapper);
     }
 
@@ -135,4 +137,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return list.stream().map(Permission::getCode).collect(Collectors.toList());
     }
 
+    @Override
+    public long save(User user) {
+        Date now = new Date();
+        user.setSalt(RandomUtil.randomStr(6));
+        user.setPassword(EncryptUtil.md5(user.getPassword(), user.getSalt()));
+        user.setEnable(YesOrNoEnum.YES.getCode());
+        user.setIsDelete(YesOrNoEnum.NO.getCode());
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        mapper.insert(user);
+        return user.getId();
+    }
 }

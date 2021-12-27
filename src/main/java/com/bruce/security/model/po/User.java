@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Copyright Copyright © 2021 Bruce . All rights reserved.
@@ -27,18 +28,35 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "账号")
     private String username;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "密码")
     private String password;
 
-    @ApiModelProperty(value = "是否启用")
-    private Boolean enable;
+    @ApiModelProperty(value = "盐值")
+    private String salt;
 
+    @ApiModelProperty(value = "是否启用")
+    private String enable;
+
+    @ApiModelProperty(value = "是否删除")
+    private String isDelete;
+
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
+
+    @ApiModelProperty(value = "创建用户")
+    private String createUser;
+
+    @ApiModelProperty(value = "更新时间")
+    private Date updateTime;
+
+    @ApiModelProperty(value = "更新用户")
+    private String updateUser;
 
 }
