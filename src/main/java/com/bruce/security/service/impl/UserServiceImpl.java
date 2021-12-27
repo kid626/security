@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.TokenComponent;
-import com.bruce.security.exceptions.ServiceExeption;
+import com.bruce.security.exceptions.ServiceException;
 import com.bruce.security.mapper.UserMapper;
 import com.bruce.security.model.constant.RedisConstant;
 import com.bruce.security.model.dto.LoginDTO;
@@ -58,10 +58,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserAuthentication login(LoginDTO loginDTO) {
         User user = getByUsername(loginDTO.getUsername());
         if (user == null) {
-            throw new ServiceExeption("用户名或密码错误!");
+            throw new ServiceException("用户名或密码错误!");
         }
         if (!loginDTO.getPassword().equals(user.getPassword())) {
-            throw new ServiceExeption("用户名或密码错误!");
+            throw new ServiceException("用户名或密码错误!");
         }
         UserAuthentication userAuthentication = new UserAuthentication();
         BeanUtils.copyProperties(user, userAuthentication);

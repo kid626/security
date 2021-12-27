@@ -1,7 +1,10 @@
 package com.bruce.security.controller;
 
+import com.bruce.security.component.CaptchaComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.config.SecurityProperty;
+import com.bruce.security.exceptions.ServiceException;
+import com.bruce.security.model.common.ImageCaptcha;
 import com.bruce.security.model.common.Result;
 import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.security.UserAuthentication;
@@ -9,11 +12,13 @@ import com.bruce.security.model.vo.PermissionVO;
 import com.bruce.security.service.PermissionService;
 import com.bruce.security.service.UserService;
 import com.bruce.security.util.CookieUtil;
+import com.bruce.security.util.ImageCaptchaUtil;
 import com.bruce.security.util.UserUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +46,8 @@ public class SecurityController {
     private SecurityProperty property;
     @Autowired
     private TokenComponent tokenComponent;
+    @Autowired
+    private CaptchaComponent captchaComponent;
 
 
     @ApiOperation("登录")
@@ -120,10 +127,23 @@ public class SecurityController {
     }
 
     @ApiOperation("获取图形验证码")
-    @GetMapping(value = "/verifyCode")
-    public Result<String> verifyCode(@RequestParam String key) {
-        // String verifyCode = userService.verifyCode(key);
-        return Result.success();
+    @GetMapping(value = "/images/captcha")
+    public void getImageCaptcha(
+            @RequestParam(value = "rid") String rid,
+            @RequestParam(value = "width", defaultValue = "160", required = false) Integer width,
+            @RequestParam(value = "height", defaultValue = "40", required = false) Integer height,
+            HttpServletResponse response) {
+        try {
+            if (rid.length() != 16) {
+                throw new ServiceException("invalid rid");
+            }
+            ImageCaptcha imageCaptcha = captchaComponent.createCaptcha(width, height, rid);
+            response.setHeader("X-Rid", imageCaptcha.getRid());
+            response.setContentType(MediaType.IMAGE_PNG_VALUE);
+            ImageCaptchaUtil.toByteArray(imageCaptcha.getBufferedImage(), response);
+        } catch (Exception e) {
+            log.info("获取图形验证码失败:{}", e.getMessage(), e);
+        }
     }
 
 

@@ -1,5 +1,6 @@
 package com.bruce.security.model.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -12,8 +13,13 @@ import lombok.Data;
 @Data
 public class LoginDTO {
 
+    @ApiModelProperty("用户名")
     private String username;
-
+    @ApiModelProperty("密码")
     private String password;
+    @ApiModelProperty("验证码key")
+    private String verifyKey;
+    @ApiModelProperty("验证码code")
+    private String verifyCode;
 
 }

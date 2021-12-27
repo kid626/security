@@ -14,4 +14,6 @@ public class RedisConstant {
 
     public static final String SECRET_KEY = "security:secret:key:{0}";
 
+    public static final String IMAGE_CAPTCHA_RID = "security:image:captcha:rid:{0}";
+
 }

@@ -24,7 +24,7 @@ public class SecurityProperty implements EnvironmentAware {
     private String[] excludeUrls;
 
     private String[] defaultExcludeUrls = new String[]{"/security/login", "/security/secretKey", "/security/showResScript",
-            "/security/showResTree", "/security/verify/code/**", "/security/redirect", "/error"};
+            "/security/showResTree", "/security/images/captcha", "/security/redirect", "/error"};
 
     private String[] swaggerUrls = new String[]{"/doc.html", "/v2/api-docs", "/v2/api-docs-ext",
             "/swagger-resources", "/webjars/**"};
