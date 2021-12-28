@@ -48,6 +48,9 @@ public class Resource implements Serializable, GrantedAuthority {
     @ApiModelProperty(value = "资源路径")
     private String url;
 
+    @ApiModelProperty(value = "图标")
+    private String icon;
+
     @ApiModelProperty(value = "排序")
     private Integer orderNum;
 

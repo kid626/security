@@ -3,6 +3,8 @@ package com.bruce.security.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.security.mapper.ResourceMapper;
+import com.bruce.security.model.enums.ResourceTypeEnum;
+import com.bruce.security.model.enums.YesOrNoEnum;
 import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.vo.ResourceVO;
 import com.bruce.security.service.ResourceService;
@@ -45,6 +47,16 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
             resourceVO.setHasChild(CollectionUtils.isEmpty(resourceVO.getChildren()));
         });
         return all.stream().filter(resourceVO -> StringUtils.isBlank(resourceVO.getParentCode())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Resource> getAvailableResources() {
+        QueryWrapper<Resource> wrapper = new QueryWrapper<>();
+        wrapper.lambda()
+                .eq(Resource::getIsDelete, YesOrNoEnum.NO.getCode())
+                .eq(Resource::getIsEnable, YesOrNoEnum.YES.getCode())
+                .eq(Resource::getType, ResourceTypeEnum.BUTTON.getCode());
+        return mapper.selectList(wrapper);
     }
 
 }

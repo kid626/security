@@ -1,0 +1,16 @@
+menu:
+  - name: 功夫
+    code: kungfu
+    icon: icon-kongfu
+    path: "/kungfu"
+    menu:
+      - name: 第一层
+        code: menu-leve1
+        path: "/menu-leve1"
+      - name: 第二层
+        code: menu-leve2
+        path: "/menu-leve2"
+  - name: 测试
+    code: test
+    icon: icon-test
+    path: "/test"

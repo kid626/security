@@ -66,7 +66,7 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
         // map 清空
         RESOURCE_MAP.clear();
         // 权限资源
-        List<Resource> resourceList = resourceService.list();
+        List<Resource> resourceList = resourceService.getAvailableResources();
         //某个资源 可以被哪些角色访问
         for (Resource re : resourceList) {
             String url = re.getUrl();

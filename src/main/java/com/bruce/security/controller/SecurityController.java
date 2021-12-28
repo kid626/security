@@ -8,8 +8,11 @@ import com.bruce.security.model.common.ImageCaptcha;
 import com.bruce.security.model.common.Result;
 import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.enums.YesOrNoEnum;
+import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.security.UserAuthentication;
 import com.bruce.security.model.vo.ResourceVO;
+import com.bruce.security.scanner.SecurityResourceScanner;
+import com.bruce.security.scanner.SecurityResourceUtil;
 import com.bruce.security.service.ResourceService;
 import com.bruce.security.service.UserService;
 import com.bruce.security.util.CookieUtil;
@@ -112,22 +115,21 @@ public class SecurityController {
 
     @GetMapping(value = "/showResScript", produces = "text/html;charset=utf-8")
     public String showResScript(@RequestParam(defaultValue = "false") boolean autoIncrement) {
-        // if (AuthContextUtil.isActiveProfile("prod")) {
-        //     return StringUtils.EMPTY;
-        // }
-        // StringBuilder sb = new StringBuilder();
-        // sb.append("# 菜单初始化脚本</br>");
-        // List<Resource> menuList = AuthResourceScanner.getMenuList();
-        // for (Resource res : menuList) {
-        //     sb.append(AuthResourceUtil.genDDL(res, autoIncrement) + "</br>");
-        // }
-        // sb.append("# 操作初始化脚本</br>");
-        // List<Resource> resourceList = AuthResourceScanner.getResourceList();
-        // for (Resource res : resourceList) {
-        //     sb.append(AuthResourceUtil.genDDL(res, autoIncrement) + "</br>");
-        // }
-        // return sb.toString();
-        return StringUtils.EMPTY;
+        if (property.isActiveProfile("prod")) {
+            return StringUtils.EMPTY;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("# 菜单初始化脚本</br>");
+        List<Resource> menuList = SecurityResourceScanner.getMenuList();
+        for (Resource res : menuList) {
+            sb.append(SecurityResourceUtil.genDDL(res, autoIncrement)).append("\n");
+        }
+        sb.append("# 操作初始化脚本</br>");
+        List<Resource> resourceList = SecurityResourceScanner.getResourceList();
+        for (Resource res : resourceList) {
+            sb.append(SecurityResourceUtil.genDDL(res, autoIncrement)).append("\n");
+        }
+        return sb.toString();
     }
 
     @ApiOperation("获取图形验证码")

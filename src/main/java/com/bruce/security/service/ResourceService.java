@@ -23,4 +23,11 @@ public interface ResourceService extends IService<Resource> {
      */
     List<ResourceVO> tree();
 
+    /**
+     * 获取所有按钮资源
+     *
+     * @return 所有按钮资源
+     */
+    List<Resource> getAvailableResources();
+
 }
