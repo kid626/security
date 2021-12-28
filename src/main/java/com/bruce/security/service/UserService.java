@@ -1,7 +1,7 @@
 package com.bruce.security.service;
 
 import com.bruce.security.model.dto.LoginDTO;
-import com.bruce.security.model.po.Permission;
+import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.po.User;
 import com.bruce.security.model.security.UserAuthentication;
 
@@ -52,7 +52,7 @@ public interface UserService {
      * @param userId 用户主键
      * @return 所有权限资源
      */
-    List<Permission> getByUserId(Long userId);
+    List<Resource> getByUserId(Long userId);
 
     /**
      * 获取资源列表

@@ -25,7 +25,7 @@ public class SecurityProperty implements EnvironmentAware {
     private String[] excludeUrls;
 
     private String[] defaultExcludeUrls = new String[]{"/security/login", "/security/secretKey", "/security/showResScript",
-            "/security/showResTree", "/security/images/captcha", "/security/redirect", "/error"};
+            "/security/menuTree", "/security/images/captcha", "/security/redirect", "/error"};
 
     private String[] swaggerUrls = new String[]{"/doc.html", "/v2/api-docs", "/v2/api-docs-ext",
             "/swagger-resources", "/webjars/**"};
@@ -81,5 +81,14 @@ public class SecurityProperty implements EnvironmentAware {
 
         private int nums = 5;
 
+    }
+
+    public boolean isActiveProfile(String profile) {
+        for (String activeProfile : this.getActiveProfiles()) {
+            if (activeProfile.equals(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,6 +1,6 @@
 package com.bruce.security.model.vo;
 
-import com.bruce.security.model.po.Permission;
+import com.bruce.security.model.po.Resource;
 import lombok.Data;
 
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.List;
  * @Author fzh
  */
 @Data
-public class PermissionVO extends Permission {
+public class ResourceVO extends Resource {
 
-    private List<PermissionVO> children;
+    private List<ResourceVO> children;
 
     private boolean hasChild;
 

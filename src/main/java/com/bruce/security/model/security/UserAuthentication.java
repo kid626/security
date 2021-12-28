@@ -1,6 +1,6 @@
 package com.bruce.security.model.security;
 
-import com.bruce.security.model.po.Permission;
+import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.po.User;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 public class UserAuthentication extends User implements Authentication {
 
-    private List<Permission> authorities;
+    private List<Resource> authorities;
 
     private String token;
 

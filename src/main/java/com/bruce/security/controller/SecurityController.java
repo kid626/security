@@ -9,8 +9,8 @@ import com.bruce.security.model.common.Result;
 import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.enums.YesOrNoEnum;
 import com.bruce.security.model.security.UserAuthentication;
-import com.bruce.security.model.vo.PermissionVO;
-import com.bruce.security.service.PermissionService;
+import com.bruce.security.model.vo.ResourceVO;
+import com.bruce.security.service.ResourceService;
 import com.bruce.security.service.UserService;
 import com.bruce.security.util.CookieUtil;
 import com.bruce.security.util.ImageCaptchaUtil;
@@ -42,7 +42,7 @@ public class SecurityController {
     @Autowired
     private UserService userService;
     @Autowired
-    private PermissionService permissionService;
+    private ResourceService resourceService;
     @Autowired
     private SecurityProperty property;
     @Autowired
@@ -105,9 +105,9 @@ public class SecurityController {
 
     @ApiOperation("获取菜单树")
     @GetMapping(value = "/menuTree")
-    public Result<PermissionVO> menuTree() {
-        PermissionVO result = permissionService.tree();
-        return Result.success(result);
+    public Result<List<ResourceVO>> menuTree() {
+        List<ResourceVO> list = resourceService.tree();
+        return Result.success(list);
     }
 
     @GetMapping(value = "/showResScript", produces = "text/html;charset=utf-8")

@@ -1,7 +1,7 @@
 package com.bruce.security.filter;
 
-import com.bruce.security.model.po.Permission;
-import com.bruce.security.service.PermissionService;
+import com.bruce.security.model.po.Resource;
+import com.bruce.security.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -27,20 +27,20 @@ import java.util.List;
 public class CustomSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
     @Autowired
-    private PermissionService permissionService;
+    private ResourceService resourceService;
 
     /**
      * 每一个资源所需要的权限 Collection<ConfigAttribute>决策器会用到
      */
-    private final static HashMap<String, Collection<ConfigAttribute>> PERMISSION_MAP = new HashMap<>(2);
+    private final static HashMap<String, Collection<ConfigAttribute>> RESOURCE_MAP = new HashMap<>(2);
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         //object 中包含用户请求的request 信息
         HttpServletRequest request = ((FilterInvocation) object).getHttpRequest();
-        for (String url : PERMISSION_MAP.keySet()) {
+        for (String url : RESOURCE_MAP.keySet()) {
             if (new AntPathRequestMatcher(url).matches(request)) {
-                return PERMISSION_MAP.get(url);
+                return RESOURCE_MAP.get(url);
             }
         }
         return null;
@@ -49,7 +49,7 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
     @Override
     public Collection<ConfigAttribute> getAllConfigAttributes() {
         // 初始化 所有资源 对应的角色
-        refreshPermission();
+        refreshResources();
         return null;
     }
 
@@ -62,19 +62,19 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
     /**
      * 刷新所有资源
      */
-    public void refreshPermission() {
+    public void refreshResources() {
         // map 清空
-        PERMISSION_MAP.clear();
+        RESOURCE_MAP.clear();
         // 权限资源
-        List<Permission> permissions = permissionService.list();
+        List<Resource> resourceList = resourceService.list();
         //某个资源 可以被哪些角色访问
-        for (Permission permission : permissions) {
-            String url = permission.getUrl();
-            String code = permission.getCode();
+        for (Resource re : resourceList) {
+            String url = re.getUrl();
+            String code = re.getCode();
             ConfigAttribute role = new SecurityConfig(code);
-            Collection<ConfigAttribute> list = PERMISSION_MAP.getOrDefault(url, new ArrayList<>());
+            Collection<ConfigAttribute> list = RESOURCE_MAP.getOrDefault(url, new ArrayList<>());
             list.add(role);
-            PERMISSION_MAP.putIfAbsent(url, list);
+            RESOURCE_MAP.putIfAbsent(url, list);
         }
     }
 

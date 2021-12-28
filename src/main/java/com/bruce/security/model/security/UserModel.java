@@ -1,7 +1,7 @@
 package com.bruce.security.model.security;
 
 import com.bruce.security.model.enums.YesOrNoEnum;
-import com.bruce.security.model.po.Permission;
+import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.po.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +26,7 @@ public class UserModel extends User implements UserDetails {
         this.setEnable(YesOrNoEnum.YES.getCode());
     }
 
-    private List<Permission> authorities;
+    private List<Resource> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

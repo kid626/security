@@ -19,6 +19,10 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @Copyright Copyright © 2020 fanzh . All rights reserved.
  * @Desc
@@ -58,14 +62,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        String[] defaultExcludeUrls = property.getDefaultExcludeUrls();
-        WebSecurity.IgnoredRequestConfigurer ignoredRequestConfigurer = web.ignoring().antMatchers(defaultExcludeUrls);
-        if (!isActiveProfile("prod")) {
-            ignoredRequestConfigurer.antMatchers(property.getSwaggerUrls());
+        List<String> list = new ArrayList<>(Arrays.asList(property.getDefaultExcludeUrls()));
+        if (!property.isActiveProfile("prod")) {
+            list.addAll(Arrays.asList(property.getSwaggerUrls()));
         }
         if (property.getExcludeUrls() != null) {
-            ignoredRequestConfigurer.antMatchers(property.getExcludeUrls());
+            list.addAll(Arrays.asList(property.getExcludeUrls()));
         }
+        web.ignoring().antMatchers(list.toArray(new String[]{}));
     }
 
     @Bean
@@ -88,16 +92,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
-    public void refreshPermission() {
-        customSecurityMetadataSource.refreshPermission();
+    public void refreshResources() {
+        customSecurityMetadataSource.refreshResources();
     }
 
-    private boolean isActiveProfile(String profile) {
-        for (String activeProfile : property.getActiveProfiles()) {
-            if (activeProfile.equals(profile)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

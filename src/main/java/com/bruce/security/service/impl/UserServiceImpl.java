@@ -10,11 +10,11 @@ import com.bruce.security.mapper.UserMapper;
 import com.bruce.security.model.constant.RedisConstant;
 import com.bruce.security.model.dto.LoginDTO;
 import com.bruce.security.model.enums.YesOrNoEnum;
-import com.bruce.security.model.po.Permission;
+import com.bruce.security.model.po.Resource;
 import com.bruce.security.model.po.Role;
 import com.bruce.security.model.po.User;
 import com.bruce.security.model.security.UserAuthentication;
-import com.bruce.security.service.RolePermissionService;
+import com.bruce.security.service.RoleResourceService;
 import com.bruce.security.service.UserRoleService;
 import com.bruce.security.service.UserService;
 import com.bruce.security.util.EncryptUtil;
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     private UserRoleService userRoleService;
 
     @Autowired
-    private RolePermissionService rolePermissionService;
+    private RoleResourceService roleResourceService;
 
     @Autowired
     private RedissonComponent redissonComponent;
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, userAuthentication);
         String token = tokenComponent.createToken(loginDTO.getUsername());
         userAuthentication.setToken(token);
-        List<Permission> list = getByUserId(user.getId());
+        List<Resource> list = getByUserId(user.getId());
         userAuthentication.setAuthorities(list);
         return userAuthentication;
     }
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
         user = mapper.selectById(user.getId());
         UserAuthentication userAuthentication = new UserAuthentication();
         BeanUtils.copyProperties(user, userAuthentication);
-        List<Permission> list = getByUserId(user.getId());
+        List<Resource> list = getByUserId(user.getId());
         userAuthentication.setToken(token);
         userAuthentication.setAuthorities(list);
         return userAuthentication;
@@ -121,20 +121,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Permission> getByUserId(Long userId) {
-        List<Permission> result = new ArrayList<>();
+    public List<Resource> getByUserId(Long userId) {
+        List<Resource> result = new ArrayList<>();
         List<Role> roleList = userRoleService.getByUserId(userId);
         for (Role role : roleList) {
-            List<Permission> permissionList = rolePermissionService.getByRoleId(role.getId());
-            result.addAll(permissionList);
+            List<Resource> resourceList = roleResourceService.getByRoleId(role.getId());
+            result.addAll(resourceList);
         }
         return result;
     }
 
     @Override
     public List<String> permList() {
-        List<Permission> list = (List<Permission>) UserUtil.getCurrentUser().getAuthorities();
-        return list.stream().map(Permission::getCode).collect(Collectors.toList());
+        List<Resource> list = (List<Resource>) UserUtil.getCurrentUser().getAuthorities();
+        return list.stream().map(Resource::getCode).collect(Collectors.toList());
     }
 
     @Override
