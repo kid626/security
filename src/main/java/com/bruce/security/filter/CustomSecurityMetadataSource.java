@@ -11,10 +11,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Copyright Copyright © 2021 fanzh . All rights reserved.
@@ -43,7 +40,7 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
                 return RESOURCE_MAP.get(url);
             }
         }
-        return null;
+        return Arrays.asList(new SecurityConfig("default"));
     }
 
     @Override
