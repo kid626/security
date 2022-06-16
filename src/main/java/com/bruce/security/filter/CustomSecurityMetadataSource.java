@@ -40,7 +40,7 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
                 return RESOURCE_MAP.get(url);
             }
         }
-        return Arrays.asList(new SecurityConfig("default"));
+        return SecurityConfig.createList("DEFAULT_RESOURCE");
     }
 
     @Override

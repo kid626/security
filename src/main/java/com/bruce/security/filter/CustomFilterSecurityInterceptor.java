@@ -6,7 +6,6 @@ import org.springframework.security.access.intercept.AbstractSecurityInterceptor
 import org.springframework.security.access.intercept.InterceptorStatusToken;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -18,7 +17,7 @@ import java.io.IOException;
  * @Date 2021/12/25 14:56
  * @Author fzh
  */
-@Component
+// @Component
 public class CustomFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
 
     @Autowired
