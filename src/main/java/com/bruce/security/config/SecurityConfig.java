@@ -5,6 +5,8 @@ import com.bruce.security.component.RedisTokenComponent;
 import com.bruce.security.component.RedissonComponent;
 import com.bruce.security.component.TokenComponent;
 import com.bruce.security.filter.AuthenticationFilter;
+import com.bruce.security.filter.CustomAccessDecisionManager;
+import com.bruce.security.filter.CustomFilterSecurityInterceptor;
 import com.bruce.security.filter.CustomSecurityMetadataSource;
 import com.bruce.security.handler.CustomAccessDeniedHandler;
 import com.bruce.security.handler.CustomAuthenticationEntryPoint;
@@ -18,6 +20,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +44,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomSecurityMetadataSource customSecurityMetadataSource;
     @Autowired
     private RedissonComponent redissonComponent;
+    @Autowired
+    private CustomSecurityMetadataSource securityMetadataSource;
+    @Autowired
+    private CustomAccessDecisionManager myAccessDecisionManager;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -57,6 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager(), userService, tokenComponent(userService, redissonComponent)))
+                .addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class)
                 .httpBasic();
     }
 
@@ -90,6 +98,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
         throw new IllegalArgumentException("token.type 不支持!");
     }
+
+    private CustomFilterSecurityInterceptor customFilterSecurityInterceptor() {
+        return new CustomFilterSecurityInterceptor(securityMetadataSource, myAccessDecisionManager);
+    }
+
 
     @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
     public void refreshResources() {

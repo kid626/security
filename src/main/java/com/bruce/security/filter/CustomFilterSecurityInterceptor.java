@@ -1,11 +1,9 @@
 package com.bruce.security.filter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
 import org.springframework.security.web.FilterInvocation;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -17,14 +15,16 @@ import java.io.IOException;
  * @Date 2021/12/25 14:56
  * @Author fzh
  */
-// @Component
 public class CustomFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
 
-    @Autowired
-    private FilterInvocationSecurityMetadataSource securityMetadataSource;
+    private CustomSecurityMetadataSource securityMetadataSource;
+    private CustomAccessDecisionManager myAccessDecisionManager;
 
-    @Autowired
-    public void setMyAccessDecisionManager(CustomAccessDecisionManager myAccessDecisionManager) {
+    public CustomFilterSecurityInterceptor(CustomSecurityMetadataSource securityMetadataSource, CustomAccessDecisionManager myAccessDecisionManager) {
+        this.securityMetadataSource = securityMetadataSource;
+        this.myAccessDecisionManager = myAccessDecisionManager;
+        // 初始化
+        securityMetadataSource.refreshResources();
         super.setAccessDecisionManager(myAccessDecisionManager);
     }
 
